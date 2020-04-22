@@ -52,11 +52,13 @@ void		parse_options(t_tracert_data *rt, int ac, char **av)
 		else
 			print_usage(42);
 	}
-	if (g_optind != 0)
+	if (g_optind != -1)
 		rt->target_str = ft_strdup(av[g_optind]);
 	if (av[g_optind + 1] != NULL)
 		rt->datasize = ft_atoi(av[g_optind + 1]);
+
 	for (int i = 0; av[i] != NULL; i++)
 		ft_strdel(&av[i]);
 	free(av);
+	
 }

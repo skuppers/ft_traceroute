@@ -44,7 +44,7 @@ int8_t		resolve_target(t_tracert_data *runtime)
 	if (getsocketresult(runtime, &result))
 		return (-1);
 	
-	runtime->sin = ((struct sockaddr_in *)result->ai_addr);
+	runtime->dst_sockaddr = result;
 	iadr = &(((struct sockaddr_in*)result->ai_addr)->sin_addr);
 	ft_bzero(buffer, INET_ADDRSTRLEN);
 	if (inet_ntop(AF_INET, iadr, buffer, INET_ADDRSTRLEN) == NULL)
@@ -53,10 +53,8 @@ int8_t		resolve_target(t_tracert_data *runtime)
 		ft_strdel(&runtime->target_str);
 		return (-1);
 	}
-	freeaddrinfo(result);
+	//freeaddrinfo(result);
 	runtime->target_ipv4 = ft_strdup(buffer);
-
 	printf("%s resolved to %s\n", runtime->target_str, runtime->target_ipv4);
-
 	return (0);
 }   

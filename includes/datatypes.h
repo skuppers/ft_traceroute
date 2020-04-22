@@ -53,7 +53,7 @@ struct						s_icmp_hdr
 };
 
 /* Based on RFC 793 */
-struct						s_tcpheader
+struct						s_tcp_hdr
 {
 	uint16_t				tcphsrcport;
 	uint16_t				tcp_destport;
@@ -79,5 +79,36 @@ struct						s_udp_hdr
     uint16_t				uh_ulen;
     uint16_t				uh_sum;
 };
+
+struct			s_pseudo_hdr
+{
+	u_int32_t source_address;
+	u_int32_t dest_address;
+	u_int8_t placeholder;
+	u_int8_t protocol;
+	u_int16_t udp_length;
+};
+
+
+typedef struct				s_upacket
+{
+	struct s_ipv4_hdr		ip;
+	struct s_udp_hdr		udp;
+	char					payload[42];
+} __attribute__ ((packed))	t_upacket;
+
+typedef struct				s_ipacket
+{
+	struct s_ipv4_hdr		ip;
+	struct s_icmp_hdr		icmp;
+	char					*payload;
+} __attribute__ ((packed))	t_ipacket;
+
+typedef struct				s_tpacket
+{
+	struct s_ipv4_hdr		ip;
+	struct s_tcp_hdr		tcp;
+	char					*payload;
+} __attribute__ ((packed))	t_tpacket;
 
 #endif

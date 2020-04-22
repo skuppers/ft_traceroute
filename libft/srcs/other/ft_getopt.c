@@ -12,7 +12,7 @@
 
 #include "ft_getopt.h"
 
-int				g_optind = 0;
+int				g_optind = -1;
 int				g_optopt = 0;
 char			*g_optarg = NULL;
 
@@ -54,7 +54,7 @@ int32_t			extract_option(char *option, char *charset)
 		else
 			return (*(++option));
 	}
-	else if (g_optind == 0)
+	else if (g_optind == -1)
 		g_optind = g_optopt - 1;
 	return (-1);
 }

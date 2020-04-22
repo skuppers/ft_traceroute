@@ -41,15 +41,29 @@
 
 # define DEFAULT_DATASIZE 42
 
+typedef struct			s_socketlst
+{
+	int32_t				socket_send;
+	int32_t				socket_recv;
+}						t_socketlst;
+
+
 typedef struct			s_tracert_data
 {
 	uint8_t				options;
-	char				*target_str;
-	char				*target_ipv4;
 	uint32_t			datasize;
 	uint16_t			first_ttl;
 
-	struct sockaddr_in		*sin;
+	char				*target_str;
+	char				*target_ipv4;
+
+	struct addrinfo		*dst_sockaddr;
+	char				*interface_name;
+	char				*interface_ipv4;
+
+
+
+	uint16_t			send_port;
 	
 }						t_tracert_data;
 
@@ -57,7 +71,17 @@ void					print_usage(uint8_t ext);
 void					print_help(uint8_t ext);
 void					traceroute_fatal(const char *failed_here, const char *errbuff);
 void					parse_options(t_tracert_data *rt, int ac, char **av);
+
 int8_t					resolve_target(t_tracert_data *runtime);
+uint8_t					select_dflt_interface(t_tracert_data *runtime);
+
+int32_t					create_sockets(t_tracert_data *runtime, t_socketlst *socketlist);
+int32_t					bind_sockets(t_tracert_data *runtime, t_socketlst *sockets);
+
+t_list      			*forge_packetlist(t_tracert_data *runtime);
+void					forge_packet(t_tracert_data *runtime, t_upacket *udppacket);
+
+uint16_t				checksum(void *b, size_t len);
 
 int32_t					ft_traceroute(t_tracert_data *runtime);
 

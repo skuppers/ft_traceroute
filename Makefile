@@ -56,6 +56,10 @@ SRCS += usage.c
 SRCS += options.c
 SRCS += resolve.c
 SRCS += ft_traceroute.c
+SRCS += socket.c
+SRCS += packet_builder.c
+SRCS += checksum.c
+SRCS += interfaces.c
 
 vpath %.c $(PATH_SRCS)
 

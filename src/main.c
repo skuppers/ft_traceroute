@@ -18,6 +18,7 @@ int								main(int ac, char **av)
 
     if (ac < 2)
         print_usage(42);
+	
 	ft_bzero(&runtime, sizeof(t_tracert_data));
 	parse_options(&runtime, ac, av);
 
