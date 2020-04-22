@@ -197,7 +197,10 @@ SRCS += ft_putstr.c
 SRCS += ft_putnstr.c
 SRCS += ft_putstr_fd.c
 SRCS += ft_ringbuffer.c
+
 SRCS += ft_getopt.c
+SRCS += ft_getopt_tools.c
+
 SRCS += ft_getdelim.c
 SRCS += ft_getargslst.c
 

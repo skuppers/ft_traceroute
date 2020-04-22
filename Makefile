@@ -24,7 +24,7 @@ LIBFT= $(PATH_LIB)libft.a
 
 CFLAGS += -Wall
 CFLAGS += -Wextra
-CFLAGS += -Werror
+#CFLAGS += -Werror
 
 DBFLAGS += $(CFLAGS)
 DBFLAGS += -fsanitize=address,undefined
@@ -45,12 +45,17 @@ vpath %.h $(INCLUDES_TRACEROUTE)
 
 HEADER += libft.h
 HEADER += ft_traceroute.h
+HEADER += datatypes.h
 
 #----------------------------------- SOURCS -----------------------------------#
 
 PATH_SRCS = src/
 
 SRCS += main.c
+SRCS += usage.c
+SRCS += options.c
+SRCS += resolve.c
+SRCS += ft_traceroute.c
 
 vpath %.c $(PATH_SRCS)
 

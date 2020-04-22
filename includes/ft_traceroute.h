@@ -32,70 +32,33 @@
 # include <ifaddrs.h>
 # include <sys/ioctl.h>
 # include <net/if.h>
-# include <bits/endian.h>
+# include "datatypes.h"
 # include "libft.h"
 
-/* Based on RFC 791 */
-struct						s_ipv4_hdr
+# define OPT_CHARSET "f:hIT"
+# define OPT_ICMP_ONLY	0x01
+# define OPT_TCP_ONLY	0x02
+
+# define DEFAULT_DATASIZE 42
+
+typedef struct			s_tracert_data
 {
-# if __BYTE_ORDER == __LITTLE_ENDIAN
+	uint8_t				options;
+	char				*target_str;
+	char				*target_ipv4;
+	uint32_t			datasize;
+	uint16_t			first_ttl;
 
-	unsigned char			ip_header_length:4;
-	unsigned char			ip_version:4;
-# elif __BYTE_ORDER == __BIG_ENDIAN
+	struct sockaddr_in		*sin;
+	
+}						t_tracert_data;
 
-	unsigned char			ip_version:4;
-	unsigned char			ip_header_length:4;
-# else
-#  error "Please fix <bits/endian.h>"
-# endif
+void					print_usage(uint8_t ext);
+void					print_help(uint8_t ext);
+void					traceroute_fatal(const char *failed_here, const char *errbuff);
+void					parse_options(t_tracert_data *rt, int ac, char **av);
+int8_t					resolve_target(t_tracert_data *runtime);
 
-	unsigned char			ip_tos;
-	unsigned short			ip_len;
-	unsigned short			ip_id;
-	unsigned short			ip_frag_offset;
-	unsigned char			ip_ttl;
-	unsigned char			ip_type;
-	unsigned short			ip_checksum;
-	struct in_addr			ip_src;
-	struct in_addr			ip_dst;
-};
-
-struct						s_icmp_hdr
-{
-	uint8_t					icmp_type;
-	uint8_t					icmp_code;
-	uint16_t				icmp_checksum;
-	uint16_t				icmp_identifier;
-	uint16_t				icmp_sequence;
-};
-
-/* Based on RFC 793 */
-struct						s_tcpheader
-{
-	uint16_t				tcphsrcport;
-	uint16_t				tcp_destport;
-	uint32_t				tcp_seqnum;
-	uint32_t				tcp_acknum;
-	uint16_t				tcp_offset:4;
-	uint16_t				tcp_reserved:6;
-	uint16_t				tcp_urg:1;
-	uint16_t				tcp_ack:1;
-	uint16_t				tcp_psh:1;
-	uint16_t				tcp_rst:1;
-	uint16_t				tcp_syn:1;
-	uint16_t				tcp_fin:1;
-	uint16_t				tcp_window;
-	uint16_t				tcp_checksum;
-	uint16_t				tcp_urgptr;
-};
-
-struct						s_udp_hdr
-{
-    uint16_t				uh_sport;
-    uint16_t				uh_dport;
-    uint16_t				uh_ulen;
-    uint16_t				uh_sum;
-};
+int32_t					ft_traceroute(t_tracert_data *runtime);
 
 #endif
