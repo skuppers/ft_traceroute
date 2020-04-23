@@ -20,8 +20,6 @@ static int8_t		set_socket_options(t_tracert_data *runtime, t_socketlst *sl)
 	on = 1;
 	if (setsockopt(sl->socket_send, SOL_SOCKET, SO_REUSEADDR, (char *) &on, sizeof(on)) < 0)
 		return (-1);
-	//if (setsockopt(sl->socket_recv, IPPROTO_IP, IP_HDRINCL, (char *) &on, sizeof(on)) < 0)
-	//	return (-1);
 	return (0);
 }
 

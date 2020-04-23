@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   socket.c                                           :+:      :+:    :+:   */
+/*   interfaces.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: skuppers <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -11,23 +11,7 @@
 /* ************************************************************************** */
 
 #include "ft_traceroute.h"
-/*
-static void				extract_ipaddr(const struct sockaddr *sa, char *ip,
-						uint32_t maxlen)
-{
-	if (sa->sa_family == AF_INET)
-		inet_ntop(AF_INET, &(((struct sockaddr_in *)sa)->sin_addr), ip,
-			maxlen);
-	else if (sa->sa_family == AF_INET6)
-		inet_ntop(AF_INET6, &(((struct sockaddr_in6 *)sa)->sin6_addr), ip,
-			maxlen);
-	else
-	{
-		traceroute_fatal("extract_ipaddr()", "Unknown AF");
-		exit(42);
-	}
-}
-*/
+
 static uint8_t		retrieve_interfaces(struct ifaddrs **interfaces)
 {
 	if (getifaddrs(interfaces) == -1)
@@ -38,6 +22,7 @@ static uint8_t		retrieve_interfaces(struct ifaddrs **interfaces)
 	return (0);
 }
 
+// TODO: Handle
 uint8_t				select_dflt_interface(t_tracert_data *runtime)
 {
 	(void)runtime;
@@ -57,9 +42,6 @@ uint8_t				select_dflt_interface(t_tracert_data *runtime)
 		}
 		if (itf_ptr->ifa_addr->sa_family == AF_INET)
 		{
-	//		runtime->interface_name = ft_strdup(itf_ptr->ifa_name);
-	//		runtime->interface_ipv4 = ft_strnew(INET_ADDRSTRLEN);
-	//		extract_ipaddr(itf_ptr->ifa_addr, runtime->interface_ipv4, INET_ADDRSTRLEN);
 			freeifaddrs(interfaces);
 			return (0);
 		}

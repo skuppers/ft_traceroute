@@ -32,7 +32,6 @@
 # include <ifaddrs.h>
 # include <sys/ioctl.h>
 # include <net/if.h>
-# include "datatypes.h"
 # include "libft.h"
 
 # define OPT_CHARSET "f:hIT"
@@ -61,16 +60,9 @@ typedef struct			s_tracert_data
 
 	char				*target_str;
 	char				*target_ipv4;
-
-//	struct sockaddr_in	trace_addr;
 	struct sockaddr_in	target_addr;
 
-//	struct addrinfo		*dst_sockaddr;
-//	char				*interface_name;
-//	char				*interface_ipv4;
-
 	char				*current_responder;
-
 	uint16_t			send_port;
 	
 }						t_tracert_data;
@@ -85,12 +77,11 @@ uint8_t					select_dflt_interface(t_tracert_data *runtime);
 
 int32_t					create_sockets(t_tracert_data *runtime, t_socketlst *socketlist);
 int32_t					bind_sockets(t_tracert_data *runtime, t_socketlst *sockets);
-
-//t_list      			*forge_packetlist(t_tracert_data *runtime);
-//void					forge_packet(t_tracert_data *runtime, t_upacket *udppacket);
-
-//uint16_t				checksum(void *b, size_t len);
-
 int32_t					ft_traceroute(t_tracert_data *runtime);
 
+void					increase_portnb(t_tracert_data *runtime);
+void					increase_ttl(t_tracert_data *runtime, t_socketlst *socks);
+float					plot_timer(t_timer *timer);
+char					*reverse_target(char *src_addr);
+void					print_stats(t_tracert_data *runtime, struct sockaddr_in *raddr, t_timer *tm);
 #endif

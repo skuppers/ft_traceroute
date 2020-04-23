@@ -15,7 +15,7 @@
 NAME=ft_traceroute
 DEBUG_NAME=ft_traceroutedbg
 
-CC=clang
+CC=gcc
 
 PATH_LIB=libft/
 
@@ -45,7 +45,6 @@ vpath %.h $(INCLUDES_TRACEROUTE)
 
 HEADER += libft.h
 HEADER += ft_traceroute.h
-HEADER += datatypes.h
 
 #----------------------------------- SOURCS -----------------------------------#
 
@@ -57,9 +56,8 @@ SRCS += options.c
 SRCS += resolve.c
 SRCS += ft_traceroute.c
 SRCS += socket.c
-SRCS += packet_builder.c
-SRCS += checksum.c
-SRCS += interfaces.c
+SRCS += utils.c
+SRCS += display.c
 
 vpath %.c $(PATH_SRCS)
 
