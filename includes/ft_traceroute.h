@@ -47,21 +47,29 @@ typedef struct			s_socketlst
 	int32_t				socket_recv;
 }						t_socketlst;
 
+typedef struct				s_timer
+{
+	struct timeval			send;
+	struct timeval			recv;
+}							t_timer;
 
 typedef struct			s_tracert_data
 {
 	uint8_t				options;
 	uint32_t			datasize;
-	uint16_t			first_ttl;
+	uint16_t			ttl;
 
 	char				*target_str;
 	char				*target_ipv4;
 
-	struct addrinfo		*dst_sockaddr;
-	char				*interface_name;
-	char				*interface_ipv4;
+//	struct sockaddr_in	trace_addr;
+	struct sockaddr_in	target_addr;
 
+//	struct addrinfo		*dst_sockaddr;
+//	char				*interface_name;
+//	char				*interface_ipv4;
 
+	char				*current_responder;
 
 	uint16_t			send_port;
 	
@@ -78,10 +86,10 @@ uint8_t					select_dflt_interface(t_tracert_data *runtime);
 int32_t					create_sockets(t_tracert_data *runtime, t_socketlst *socketlist);
 int32_t					bind_sockets(t_tracert_data *runtime, t_socketlst *sockets);
 
-t_list      			*forge_packetlist(t_tracert_data *runtime);
-void					forge_packet(t_tracert_data *runtime, t_upacket *udppacket);
+//t_list      			*forge_packetlist(t_tracert_data *runtime);
+//void					forge_packet(t_tracert_data *runtime, t_upacket *udppacket);
 
-uint16_t				checksum(void *b, size_t len);
+//uint16_t				checksum(void *b, size_t len);
 
 int32_t					ft_traceroute(t_tracert_data *runtime);
 

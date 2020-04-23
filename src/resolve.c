@@ -12,6 +12,8 @@
 
 #include "ft_traceroute.h"
 
+
+
 static void				prepare_hints(struct addrinfo *hints)
 {
 	memset(hints, 0, sizeof(struct addrinfo));
@@ -34,27 +36,35 @@ static uint8_t			getsocketresult(t_tracert_data *runtime, struct addrinfo **resu
 	return (0);
 }
 
-int8_t		resolve_target(t_tracert_data *runtime)
+uint8_t		store_target_strings(t_tracert_data *runtime)
 {
-	struct addrinfo		*result;
-	struct in_addr		*iadr;
 	char				buffer[INET_ADDRSTRLEN];
 
-	result = NULL;
-	if (getsocketresult(runtime, &result))
-		return (-1);
-	
-	runtime->dst_sockaddr = result;
-	iadr = &(((struct sockaddr_in*)result->ai_addr)->sin_addr);
 	ft_bzero(buffer, INET_ADDRSTRLEN);
-	if (inet_ntop(AF_INET, iadr, buffer, INET_ADDRSTRLEN) == NULL)
+	if (inet_ntop(AF_INET, &runtime->target_addr.sin_addr, buffer, INET_ADDRSTRLEN) == NULL)
 	{
 		traceroute_fatal("inet_ntop", "undefined");
 		ft_strdel(&runtime->target_str);
 		return (-1);
 	}
-	//freeaddrinfo(result);
 	runtime->target_ipv4 = ft_strdup(buffer);
+	return (0);
+}
+
+int8_t		resolve_target(t_tracert_data *runtime)
+{
+	struct addrinfo		*result;
+	
+	result = NULL;
+	if (getsocketresult(runtime, &result))
+		return (-1);
+	
+	runtime->target_addr = *((struct sockaddr_in*)result->ai_addr);
+	runtime->target_addr.sin_family = AF_INET;
+	runtime->target_addr.sin_port = htons(runtime->send_port);
+	memset(&(runtime->target_addr.sin_zero), '\0', 8);
+
+	store_target_strings(runtime);
 	printf("%s resolved to %s\n", runtime->target_str, runtime->target_ipv4);
 	return (0);
-}   
+}

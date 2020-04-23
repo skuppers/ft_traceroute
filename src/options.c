@@ -34,7 +34,7 @@ static void		handle_standalone_options(t_tracert_data *rt, char opt)
 static void		handle_custom_options(t_tracert_data *rt, char opt, char *oarg)
 {
 	if (opt == 'f')
-		(ft_atoi(oarg) > 0) ? rt->first_ttl = (uint32_t)ft_atoi(oarg) : invalid_opt(oarg, "f");
+		(ft_atoi(oarg) > 0) ? rt->ttl = (uint32_t)ft_atoi(oarg) : invalid_opt(oarg, "f");
 }
 
 void		parse_options(t_tracert_data *rt, int ac, char **av)
@@ -56,9 +56,11 @@ void		parse_options(t_tracert_data *rt, int ac, char **av)
 		rt->target_str = ft_strdup(av[g_optind]);
 	if (av[g_optind + 1] != NULL)
 		rt->datasize = ft_atoi(av[g_optind + 1]);
+	else
+		rt->datasize = 36;	
 
 	for (int i = 0; av[i] != NULL; i++)
 		ft_strdel(&av[i]);
 	free(av);
-	
+	rt->send_port = 33434;
 }

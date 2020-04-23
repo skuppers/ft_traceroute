@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "ft_traceroute.h"
-
+/*
 static void				extract_ipaddr(const struct sockaddr *sa, char *ip,
 						uint32_t maxlen)
 {
@@ -27,7 +27,7 @@ static void				extract_ipaddr(const struct sockaddr *sa, char *ip,
 		exit(42);
 	}
 }
-
+*/
 static uint8_t		retrieve_interfaces(struct ifaddrs **interfaces)
 {
 	if (getifaddrs(interfaces) == -1)
@@ -40,6 +40,7 @@ static uint8_t		retrieve_interfaces(struct ifaddrs **interfaces)
 
 uint8_t				select_dflt_interface(t_tracert_data *runtime)
 {
+	(void)runtime;
 	struct ifaddrs	*itf_ptr;
 	struct ifaddrs	*interfaces;
 
@@ -56,9 +57,9 @@ uint8_t				select_dflt_interface(t_tracert_data *runtime)
 		}
 		if (itf_ptr->ifa_addr->sa_family == AF_INET)
 		{
-			runtime->interface_name = ft_strdup(itf_ptr->ifa_name);
-			runtime->interface_ipv4 = ft_strnew(INET_ADDRSTRLEN);
-			extract_ipaddr(itf_ptr->ifa_addr, runtime->interface_ipv4, INET_ADDRSTRLEN);
+	//		runtime->interface_name = ft_strdup(itf_ptr->ifa_name);
+	//		runtime->interface_ipv4 = ft_strnew(INET_ADDRSTRLEN);
+	//		extract_ipaddr(itf_ptr->ifa_addr, runtime->interface_ipv4, INET_ADDRSTRLEN);
 			freeifaddrs(interfaces);
 			return (0);
 		}
