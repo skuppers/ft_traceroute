@@ -20,13 +20,8 @@ int								main(int ac, char **av)
     {
 		print_usage(42);
 	}
-	
 	ft_bzero(&runtime, sizeof(t_tracert_data));
 	parse_options(&runtime, ac, av);
-
-	printf("Target %s datasize %d first TTL %d\n", runtime.target_str, runtime.datasize, runtime.ttl);
-	printf("Target port: %d\n", runtime.send_port);
-
 	if (runtime.target_str == NULL)
 		print_usage(42);
 

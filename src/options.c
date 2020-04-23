@@ -34,14 +34,30 @@ static void		handle_standalone_options(t_tracert_data *rt, char opt)
 static void		handle_custom_options(t_tracert_data *rt, char opt, char *oarg)
 {
 	if (opt == 'f')
-		(ft_atoi(oarg) > 0) ? rt->ttl = (uint32_t)ft_atoi(oarg) : invalid_opt(oarg, "f");
+		(ft_atoi(oarg) >= 0) ? rt->ttl = (uint32_t)ft_atoi(oarg) : invalid_opt(oarg, "f");
+}
+
+void		set_defaults(t_tracert_data *rt, char **av)
+{
+	if (g_optind != -1)
+		rt->target_str = ft_strdup(av[g_optind]);
+
+	if (av[g_optind + 1] != NULL)
+		rt->totalsize = ft_atoi(av[g_optind + 1]);
+	else
+		rt->totalsize = DEFAULT_TOTALSIZE;
+
+	if (rt->totalsize < MINIMAL_TOTALSIZE)
+		rt->totalsize = MINIMAL_TOTALSIZE;
+	rt->datasize = (rt->totalsize - MINIMAL_TOTALSIZE);
+	rt->send_port = DEFAULT_STARTPORT;
 }
 
 void		parse_options(t_tracert_data *rt, int ac, char **av)
 {
 	int32_t	option;
 
-	
+	rt->ttl = 1;
 	av = ft_getopt_order_arguments(ac, av, OPT_CHARSET);
 	while ((option = ft_getopt(ac, av, OPT_CHARSET)) != -1)
 	{
@@ -52,15 +68,6 @@ void		parse_options(t_tracert_data *rt, int ac, char **av)
 		else
 			print_usage(42);
 	}
-	if (g_optind != -1)
-		rt->target_str = ft_strdup(av[g_optind]);
-	if (av[g_optind + 1] != NULL)
-		rt->datasize = ft_atoi(av[g_optind + 1]);
-	else
-		rt->datasize = 36;	
-
-	for (int i = 0; av[i] != NULL; i++)
-		ft_strdel(&av[i]);
-	free(av);
-	rt->send_port = 33434;
+	set_defaults(rt, av);
+	ft_freetab(&av);
 }

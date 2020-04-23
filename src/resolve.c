@@ -12,8 +12,6 @@
 
 #include "ft_traceroute.h"
 
-
-
 static void				prepare_hints(struct addrinfo *hints)
 {
 	memset(hints, 0, sizeof(struct addrinfo));
@@ -58,13 +56,11 @@ int8_t		resolve_target(t_tracert_data *runtime)
 	result = NULL;
 	if (getsocketresult(runtime, &result))
 		return (-1);
-	
+	runtime->result = result;
 	runtime->target_addr = *((struct sockaddr_in*)result->ai_addr);
 	runtime->target_addr.sin_family = AF_INET;
 	runtime->target_addr.sin_port = htons(runtime->send_port);
 	memset(&(runtime->target_addr.sin_zero), '\0', 8);
-
 	store_target_strings(runtime);
-	printf("%s resolved to %s\n", runtime->target_str, runtime->target_ipv4);
 	return (0);
 }

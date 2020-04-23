@@ -21,11 +21,10 @@ void			increase_portnb(t_tracert_data *runtime)
 //TODO: Do error handling w/ return values
 void			increase_ttl(t_tracert_data *runtime, t_socketlst *socks)
 {
-	runtime->ttl++;
 	if (setsockopt(socks->socket_send, IPPROTO_IP, IP_TTL, &runtime->ttl,
 		sizeof(uint8_t)) < 0)
 	{
-		traceroute_fatal("setsockopt", "unknown");
+		traceroute_fatal("increase_ttl", "unknown");
     }
 }
 
@@ -44,18 +43,10 @@ float		plot_timer(t_timer *timer)
 }
 
 //TODO: change char *src_addr to struct sockaddr_in for simplicity's sake
-char					*reverse_target(char *src_addr)
-{
-	struct sockaddr_in	sa;
-	char				hostname[256];
-
-	memset(&sa, 0, sizeof(sa));
-	sa.sin_family = AF_INET;
-	inet_pton(AF_INET, src_addr, &sa.sin_addr);
-	
-	if (getnameinfo((struct sockaddr*)&sa, sizeof(sa),
-			hostname, sizeof(hostname),
-			NULL, 0, NI_NAMEREQD))
-		return (NULL);
-	return (ft_strdup(hostname));
+void		reverse_target(struct sockaddr_in *raddr, char *buffer)
+{	
+	if (getnameinfo((struct sockaddr *)raddr, sizeof(struct sockaddr),
+			buffer, 256,
+			NULL, 0, 0))
+		;
 }

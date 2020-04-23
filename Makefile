@@ -15,7 +15,7 @@
 NAME=ft_traceroute
 DEBUG_NAME=ft_traceroutedbg
 
-CC=gcc
+CC=clang
 
 PATH_LIB=libft/
 
