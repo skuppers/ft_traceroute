@@ -24,7 +24,7 @@ uint8_t			send_udppacket(t_tracert_data *runtime, t_socketlst *socks, t_timer *t
 					sizeof(struct sockaddr));
 	if (sent_bytes < 0)
 	{
-		printf(" -S_Err!- ");
+		traceroute_fatal("send_udp_packet()", "No  data has been sent or an error happened\n");
 		return (1);
 	}
 	gettimeofday(&tm->send, NULL);
@@ -79,11 +79,34 @@ uint8_t			receive_routine(t_tracert_data *runtime, t_socketlst *socks, t_timer *
 	return (0);
 }
 
+void			print_traceroute(t_tracert_data *runtime)
+{
+	printf("ft_traceroute to %s (%s), %d hops max, %d byte packets\n",
+			runtime->target_str, runtime->target_ipv4,
+			runtime->max_ttl, runtime->totalsize);
+}
+
+uint			traceroute_condition(t_tracert_data *runtime, t_loopdata	*ld)
+{
+	if (ld->reached_target != 0)
+		return (0);
+	if (ld->request_nb > runtime->max_ttl)
+		return (0);
+	return (1);
+}
+
+void			print_request_nb(t_tracert_data *runtime)
+{
+	if (runtime->ttl < 10)
+		printf(" %d ", runtime->ttl);
+	else
+		printf("%d ", runtime->ttl);
+}
+
 int32_t			ft_traceroute(t_tracert_data *runtime)
 {
-	int					packetcount;
-	int					reached_target;
-	int					request_nb;
+	t_loopdata			ld;
+
 	t_timer				pktimer;
 	t_socketlst			sockets;
 
@@ -91,29 +114,30 @@ int32_t			ft_traceroute(t_tracert_data *runtime)
 	if (create_sockets(&sockets) != 0)
 		return (-1);
 
-	printf("ft_traceroute to %s (%s), 30 hops max, %d byte packets\n",
-				runtime->target_str, runtime->target_ipv4, runtime->totalsize);
+	print_traceroute(runtime);
 
-//	printf("Selected interface: %s | addr: %s\n", runtime->interface_name, runtime->interface_ipv4);
+	ld.request_nb = 1;
+	ld.reached_target = 0;
 
-	request_nb = 1;
-	reached_target = 0;
-	while (reached_target == 0 || request_nb >= 30) // TODO: No signals, target not reached & max ttl not reached
+	while (traceroute_condition(runtime, &ld) == 1) // TODO: No signals, target not reached
 	{
 		increase_ttl(runtime, &sockets);
-		printf(" %d ", runtime->ttl);
-		packetcount = 0;
+		print_request_nb(runtime);
+		
+		
+		ld.packetcount = 0;
 		runtime->current_responder = NULL;
-		while (packetcount < 3)
+		while (ld.packetcount < runtime->nqueries)
 		{
-			send_udppacket(runtime, &sockets, &pktimer);
-			reached_target = receive_routine(runtime, &sockets, &pktimer);
+			if (send_udppacket(runtime, &sockets, &pktimer) != 0)
+				break;
+			ld.reached_target = receive_routine(runtime, &sockets, &pktimer);
 			increase_portnb(runtime);
-			++packetcount;
+			++ld.packetcount;
 		}
 		printf("\n");
 		ft_strdel(&runtime->current_responder);
-		++request_nb;
+		++ld.request_nb;
 		++runtime->ttl;
 	}
 	ft_strdel(&runtime->target_str);

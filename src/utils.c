@@ -42,11 +42,10 @@ float		plot_timer(t_timer *timer)
 	return ((float)(recv - send) * 1000.0f);
 }
 
-//TODO: change char *src_addr to struct sockaddr_in for simplicity's sake
 void		reverse_target(struct sockaddr_in *raddr, char *buffer)
 {	
 	if (getnameinfo((struct sockaddr *)raddr, sizeof(struct sockaddr),
 			buffer, 256,
 			NULL, 0, 0))
-		;
+		ft_bzero(buffer, 256);
 }

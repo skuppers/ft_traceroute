@@ -37,12 +37,10 @@
 # define IP4_HDRLEN		20
 # define UDP_HDRLEN		8
 
-# define OPT_CHARSET "f:hIT"
+# define OPT_CHARSET "N:m:f:hI"
 # define OPT_ICMP_ONLY	0x01
-# define OPT_TCP_ONLY	0x02
 
 # define DEFAULT_STARTPORT	33434
-
 # define DEFAULT_TOTALSIZE	60
 # define MINIMAL_TOTALSIZE	28
 # define DEFAULT_DATASIZE	32
@@ -65,6 +63,8 @@ typedef struct			s_tracert_data
 	uint32_t			totalsize;
 	uint32_t			datasize;
 	uint16_t			ttl;
+	uint16_t			max_ttl;
+	uint8_t				nqueries;
 
 	char				*target_str;
 	char				*target_ipv4;
@@ -76,6 +76,13 @@ typedef struct			s_tracert_data
 	uint16_t			send_port;
 	
 }						t_tracert_data;
+
+typedef struct			s_loopdata
+{
+	int					packetcount;
+	int					reached_target;
+	int					request_nb;
+}						t_loopdata;
 
 void					print_usage(uint8_t ext);
 void					print_help(uint8_t ext);

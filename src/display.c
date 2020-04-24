@@ -21,14 +21,14 @@ void			print_stats(t_tracert_data *runtime, struct sockaddr_in *raddr, t_timer *
 	{
 		runtime->current_responder = ft_strdup(inet_ntoa(raddr->sin_addr));
 		reverse_target(raddr, fqdn);
-		printf(" %s (%s) ", fqdn, runtime->current_responder);
+		printf(" %s (%s) ", (ft_strlen(fqdn) == 0 ) ? runtime->current_responder : fqdn, runtime->current_responder);
 	}
 	else if (ft_strequ(runtime->current_responder, inet_ntoa(raddr->sin_addr)) == 0)
 	{
 		ft_strdel(&runtime->current_responder);
 		runtime->current_responder = ft_strdup(inet_ntoa(raddr->sin_addr));
 		reverse_target(raddr, fqdn);
-		printf(" %s (%s) ", fqdn, runtime->current_responder);
+		printf(" %s (%s) ", (ft_strlen(fqdn) == 0 ) ? runtime->current_responder : fqdn, runtime->current_responder);
 	}
 	printf(" %.3f ms ", plot_timer(tm));
 }
