@@ -20,7 +20,7 @@ CC=clang
 PATH_LIB=libft/
 
 LIBFT= $(PATH_LIB)libft.a
-
+LIBFTDB= $(PATH_LIB)libftdb.a
 
 CFLAGS += -Wall
 CFLAGS += -Wextra
@@ -92,8 +92,8 @@ $(LIBFT): FORCE
 
 debug: $(DEBUG_PATH_OBJS) $(DEBUG_NAME)
 
-$(DEBUG_NAME): $(LIBFT) $(DEBUG_OBJS)
-	$(CC) $(DBFLAGS) $(I_INCLUDES) $(DEBUG_OBJS) $(LIBFT) -o $@
+$(DEBUG_NAME): $(LIBFTDB) $(DEBUG_OBJS)
+	$(CC) $(DBFLAGS) $(I_INCLUDES) $(DEBUG_OBJS) $(LIBFTDB) -o $@
 	printf "$@ is ready.\n"
 
 $(DEBUG_OBJS): $(DEBUG_PATH_OBJS)%.o: %.c $(HEADER) Makefile
@@ -101,6 +101,9 @@ $(DEBUG_OBJS): $(DEBUG_PATH_OBJS)%.o: %.c $(HEADER) Makefile
 
 $(DEBUG_PATH_OBJS):
 	mkdir $@
+
+$(LIBFTDB): FORCE
+	$(MAKE) debug -C $(PATH_LIB)
 
 #---------------------------------- CLEANING ----------------------------------#
 

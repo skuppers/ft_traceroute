@@ -27,8 +27,6 @@ static void		handle_standalone_options(t_tracert_data *rt, char opt)
 		print_help(1);
 	else if (opt == 'I')
 		rt->options |= OPT_ICMP_ONLY;
-	else if (opt == 'T')
-		rt->options |= OPT_TCP_ONLY;
 }
 
 static void		handle_custom_options(t_tracert_data *rt, char opt, char *oarg)
