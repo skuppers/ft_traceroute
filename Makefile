@@ -58,6 +58,8 @@ SRCS += ft_traceroute.c
 SRCS += socket.c
 SRCS += utils.c
 SRCS += display.c
+SRCS += send.c
+SRCS += receive.c
 
 vpath %.c $(PATH_SRCS)
 

@@ -14,21 +14,17 @@
 
 int								main(int ac, char **av)
 {
-    t_tracert_data		runtime;
+	t_tracert_data				runtime; 
 
-    if (ac < 2)
-    {
+	if (ac < 2)
 		print_usage(42);
-	}
 	ft_bzero(&runtime, sizeof(t_tracert_data));
-	parse_options(&runtime, ac, av);
+	parse_options(&runtime, av);
 	if (runtime.target_str == NULL)
 		print_usage(42);
-
 	if (resolve_target(&runtime) < 0)
 		return (-1);
 	else
 		return (ft_traceroute(&runtime));
-
 	return (0);
 }

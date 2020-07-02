@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   interfaces.c                                       :+:      :+:    :+:   */
+/*   send.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: skuppers <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,42 +12,23 @@
 
 #include "ft_traceroute.h"
 
-static uint8_t		retrieve_interfaces(struct ifaddrs **interfaces)
+uint8_t			send_udppacket(t_tracert_data *runtime, t_socketlst *socks,
+					t_timer *tm)
 {
-	if (getifaddrs(interfaces) == -1)
+	int16_t		sent_bytes;
+	char		data_buffer[1468];
+
+	ft_memset(&data_buffer, 0x42, 1468);
+	sent_bytes = sendto(socks->socket_send,
+					data_buffer, runtime->datasize, 0,
+					(struct sockaddr*)&runtime->target_addr,
+					sizeof(struct sockaddr));
+	if (sent_bytes < 0)
 	{
-		traceroute_fatal("getifaddrs", "could not retreive interfaces");
+		traceroute_fatal("send_udp_packet()",
+			"No  data has been sent or an error happened\n");
 		return (1);
 	}
+	gettimeofday(&tm->send, NULL);
 	return (0);
-}
-
-// TODO: Handle
-uint8_t				select_dflt_interface(t_tracert_data *runtime)
-{
-	(void)runtime;
-	struct ifaddrs	*itf_ptr;
-	struct ifaddrs	*interfaces;
-
-	if (retrieve_interfaces(&interfaces))
-		return (-1);
-
-	itf_ptr = interfaces;
-	while (itf_ptr != NULL)
-	{
-		if (itf_ptr->ifa_addr == NULL || ft_strequ(itf_ptr->ifa_name, "lo"))
-		{
-			itf_ptr = itf_ptr->ifa_next;
-			continue;
-		}
-		if (itf_ptr->ifa_addr->sa_family == AF_INET)
-		{
-			freeifaddrs(interfaces);
-			return (0);
-		}
-		itf_ptr = itf_ptr->ifa_next;
-	}
-	freeifaddrs(interfaces);
-	printf("ft_traceroute: Network is unreachable.\n");
-	return (-1);
 }

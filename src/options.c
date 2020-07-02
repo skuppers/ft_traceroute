@@ -10,34 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "ft_traceroute.h"
-
-static void			invalid_opt(char *optarg, char *option)
-{
-	if (optarg == NULL)
-		printf("ft_traceroute: option requires an argument -- '%s'\n", option);
-	else
-		printf("ft_traceroute: invalid argument: %s\n", optarg);
-	exit(-1);
-}
-
-static void		handle_standalone_options(t_tracert_data *rt, char opt)
-{
-	if (opt == 'h')
-		print_help(1);
-	else if (opt == 'I')
-		rt->options |= OPT_ICMP_ONLY;
-}
-
-static void		handle_custom_options(t_tracert_data *rt, char opt, char *oarg)
-{
-	if (opt == 'f')
-		(ft_atoi(oarg) >= 0) ? rt->ttl = (uint32_t)ft_atoi(oarg) : invalid_opt(oarg, "f");
-	else if (opt == 'N')
-		(ft_atoi(oarg) >= 0) ? rt->nqueries = (uint32_t)ft_atoi(oarg) : invalid_opt(oarg, "N");
-	else if (opt == 'm')
-		(ft_atoi(oarg) >= 0) ? rt->max_ttl = (uint32_t)ft_atoi(oarg) : invalid_opt(oarg, "m");
-}
+#include "ft_traceroute.h"
 
 void		set_defaults(t_tracert_data *rt)
 {
@@ -45,36 +18,116 @@ void		set_defaults(t_tracert_data *rt)
 	rt->ttl = 1;
 	rt->nqueries = 3;
 	rt->max_ttl = 30;
-}	
-
-void		get_dest_and_pktsz(t_tracert_data *rt, char **av)
-{
-	if (g_optind != -1)
-		rt->target_str = ft_strdup(av[g_optind]);
-	if (av[g_optind + 1] != NULL)
-		rt->totalsize = ft_atoi(av[g_optind + 1]);
-	else
-		rt->totalsize = DEFAULT_TOTALSIZE;
-	if (rt->totalsize < MINIMAL_TOTALSIZE)
-		rt->totalsize = MINIMAL_TOTALSIZE;
-	rt->datasize = (rt->totalsize - MINIMAL_TOTALSIZE);
+	rt->totalsize = 0;
+	rt->target_str = NULL;
 }
 
-void		parse_options(t_tracert_data *rt, int ac, char **av)
+void			traceroute_exit(int exitcode, const char *message, ...)
 {
-	int32_t	option;
+	va_list			args;
 
-	set_defaults(rt);
-	av = ft_getopt_order_arguments(ac, av, OPT_CHARSET);
-	while ((option = ft_getopt(ac, av, OPT_CHARSET)) != -1)
+	dprintf(STDERR_FILENO, "ft_traceroute: ");
+	va_start(args, message);
+	vdprintf(STDERR_FILENO, message, args);
+	va_end(args);
+	exit(exitcode);
+}
+
+static uint8_t	check_valid(char *arg, size_t len, int min, int max)
+{
+	if (ft_isnumeric(arg) == 0)
+		traceroute_exit(42, "invalid argument: '%s'", arg);
+	if (ft_strlen(arg) > len || ft_atoi(arg) < min || ft_atoi(arg) > max)
+		traceroute_exit(42, "argument '%s' not in range: %d - %d\n", arg,
+		min, max);
+	return (1);
+}
+
+static int		get_arg_opt(char *arg, const char *opt_str[],
+								const int count, t_tracert_data *param)
+{
+	if (arg == NULL)
+		traceroute_exit(42, "option requires an argument -- '%s'\n",
+			opt_str[count]);
+	if (ft_strequ(opt_str[count], "-f") == 1 && check_valid(arg, 3, 1, 255))
+		param->ttl = ft_atoi(arg);
+	if (ft_strequ(opt_str[count], "-q") == 1 && check_valid(arg, 3, 1, 255))
+		param->nqueries = ft_atoi(arg);
+	if (ft_strequ(opt_str[count], "-m") == 1 && check_valid(arg, 3, 1, 255))
+		param->max_ttl = ft_atoi(arg);
+	return (2);
+}
+
+static int		get_one_opt(char **av, int i, t_tracert_data *runtime)
+{
+	int			count;
+	const char	*opt_str[] = {"-h", "-n", "-f", "-q", "-m" };
+
+	count = 0;
+	while (count < NB_OPT)
 	{
-		if (option == 'h' || option == 'U' || option == 'T')
-			handle_standalone_options(rt, option);
-		else if (option == 'f' || option == 'N' || option == 'm')
-			handle_custom_options(rt, option, g_optarg);
-		else
-			print_usage(42);
+		if (ft_strequ(av[i], opt_str[count]) == 1)
+		{
+			if (count < OPT_WITHOUT_ARG)
+			{
+				runtime->options |= (1 << count);
+				if (runtime->options & OPT_HELP)
+					print_help(42);
+				return (1);
+			}
+			else
+				return (get_arg_opt(av[i + 1], opt_str, count, runtime));
+		}
+		count++;
 	}
-	get_dest_and_pktsz(rt, av);
-	ft_freetab(&av);
+	traceroute_exit(42, "invalid option -- '%s'\n", av[i]);
+	return (0);
+}
+
+static void	get_msgsize(t_tracert_data *rt, char *av)
+{
+	if (ft_strlen(av) > 5 || ft_isnumeric(av) == 0)
+	{
+		traceroute_exit(42, "invalid size -- '%s'\n", av);
+	}
+	else if (ft_atoi(av) < 0 || ft_atoi(av) > 1500)
+	{
+		traceroute_exit(42, "invalid size -- '%s'\n", av);
+	}
+	else
+	{
+		rt->totalsize = ft_atoi(av);
+		if (rt->totalsize < MINIMAL_TOTALSIZE)
+			rt->totalsize = MINIMAL_TOTALSIZE;
+	}
+}
+
+void		parse_options(t_tracert_data *rt, char **av)
+{
+	int			i;
+
+	++av;
+	i = 0;
+	set_defaults(rt);
+	while (av[i] != NULL)
+	{
+		if (av[i][0] == '-')
+		{
+			i += get_one_opt(av, i, rt);
+			continue ;
+		}
+		else
+		{
+			if (rt->target_str == NULL)
+				rt->target_str = ft_strdup(av[i]);
+			else if (rt->totalsize == 0)
+				get_msgsize(rt, av[i]);
+			else
+				traceroute_exit(42, "invalid option -- '%s'\n", av[i]);
+			++i;
+		}
+	}
+	if (rt->totalsize == 0)
+		rt->totalsize = DEFAULT_TOTALSIZE;
+	rt->datasize = (rt->totalsize - MINIMAL_TOTALSIZE);
 }

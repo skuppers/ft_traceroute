@@ -18,20 +18,17 @@ void			increase_portnb(t_tracert_data *runtime)
 	runtime->target_addr.sin_port = htons(runtime->send_port);
 }
 
-//TODO: Do error handling w/ return values
 void			increase_ttl(t_tracert_data *runtime, t_socketlst *socks)
 {
 	if (setsockopt(socks->socket_send, IPPROTO_IP, IP_TTL, &runtime->ttl,
-		sizeof(uint8_t)) < 0)
-	{
+			sizeof(uint8_t)) < 0)
 		traceroute_fatal("increase_ttl", "unknown");
-    }
 }
 
-float		plot_timer(t_timer *timer)
+float			plot_timer(t_timer *timer)
 {
-	double	send;
-	double	recv;
+	double		send;
+	double		recv;
 
 	send = 0;
 	recv = 0;
@@ -42,10 +39,9 @@ float		plot_timer(t_timer *timer)
 	return ((float)(recv - send) * 1000.0f);
 }
 
-void		reverse_target(struct sockaddr_in *raddr, char *buffer)
+void			reverse_target(struct sockaddr_in *raddr, char *buffer)
 {	
 	if (getnameinfo((struct sockaddr *)raddr, sizeof(struct sockaddr),
-			buffer, 256,
-			NULL, 0, 0))
+			buffer, 256, NULL, 0, 0))
 		ft_bzero(buffer, 256);
 }

@@ -12,7 +12,7 @@
 
 #include "ft_traceroute.h"
 
-static void				prepare_hints(struct addrinfo *hints)
+static void			prepare_hints(struct addrinfo *hints)
 {
 	memset(hints, 0, sizeof(struct addrinfo));
 	hints->ai_family = AF_INET;
@@ -20,26 +20,29 @@ static void				prepare_hints(struct addrinfo *hints)
 	hints->ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
 }
 
-static uint8_t			getsocketresult(t_tracert_data *runtime, struct addrinfo **results)
+static uint8_t		getsocketresult(t_tracert_data *runtime,
+							struct addrinfo **results)
 {
-	struct addrinfo		hints;
+	struct addrinfo	hints;
 
 	prepare_hints(&hints);
 	if ((getaddrinfo(runtime->target_str, NULL, &hints, results)) != 0)
 	{
-		printf("ft_traceroute: %s: Temporary failure in name resolution\n", runtime->target_str);
+		printf("ft_traceroute: %s: Temporary failure in name resolution\n",
+				runtime->target_str);
 		ft_strdel(&runtime->target_str);
 		return (1);
 	}
 	return (0);
 }
 
-uint8_t		store_target_strings(t_tracert_data *runtime)
+uint8_t				store_target_strings(t_tracert_data *runtime)
 {
-	char				buffer[INET_ADDRSTRLEN];
+	char			buffer[INET_ADDRSTRLEN];
 
 	ft_bzero(buffer, INET_ADDRSTRLEN);
-	if (inet_ntop(AF_INET, &runtime->target_addr.sin_addr, buffer, INET_ADDRSTRLEN) == NULL)
+	if (inet_ntop(AF_INET, &runtime->target_addr.sin_addr, buffer,
+		INET_ADDRSTRLEN) == NULL)
 	{
 		traceroute_fatal("inet_ntop", "undefined");
 		ft_strdel(&runtime->target_str);
@@ -49,10 +52,10 @@ uint8_t		store_target_strings(t_tracert_data *runtime)
 	return (0);
 }
 
-int8_t		resolve_target(t_tracert_data *runtime)
+int8_t				resolve_target(t_tracert_data *runtime)
 {
-	struct addrinfo		*result;
-	
+	struct addrinfo	*result;
+
 	result = NULL;
 	if (getsocketresult(runtime, &result))
 		return (-1);
