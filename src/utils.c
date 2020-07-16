@@ -23,6 +23,7 @@ void			increase_ttl(t_tracert_data *runtime, t_socketlst *socks)
 	if (setsockopt(socks->socket_send, IPPROTO_IP, IP_TTL, &runtime->ttl,
 			sizeof(uint8_t)) < 0)
 		traceroute_fatal("increase_ttl", "unknown");
+	++runtime->ttl;
 }
 
 float			plot_timer(t_timer *timer)
@@ -40,7 +41,7 @@ float			plot_timer(t_timer *timer)
 }
 
 void			reverse_target(struct sockaddr_in *raddr, char *buffer)
-{	
+{
 	if (getnameinfo((struct sockaddr *)raddr, sizeof(struct sockaddr),
 			buffer, 256, NULL, 0, 0))
 		ft_bzero(buffer, 256);

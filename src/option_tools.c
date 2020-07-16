@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   usage.c                                            :+:      :+:    :+:   */
+/*   options_tools.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: skuppers <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,38 +12,37 @@
 
 #include "ft_traceroute.h"
 
-void	print_usage(uint8_t ext)
+void		set_defaults(t_tracert_data *rt)
 {
-	dprintf(2, "\nUsage:\t./ft_traceroute [options] host [packet_len]\n");
-	if (ext != 0)
-		exit(ext);
+	rt->send_port = DEFAULT_STARTPORT;
+	rt->ttl = 1;
+	rt->nqueries = 3;
+	rt->max_ttl = 30;
+	rt->totalsize = 0;
+	rt->target_str = NULL;
 }
 
-#ifdef BONUS_H
-
-void	print_help(uint8_t ext)
+void		traceroute_exit(int exitcode, const char *message, ...)
 {
-	dprintf(2, "Options: \n");
-	dprintf(2, "  -h\t\tShows this page.\n");
-	dprintf(2, "  -n\t\tDo not resolve dns.\n");
-	dprintf(2, "  -f <number>\tSpecify TTL to start with.\n");
-	dprintf(2, "  -q <number>\tSet the number of probes.\n");
-	dprintf(2, "  -m <number>\tSpecify max amount of hops.\n");
-	print_usage(ext);
+	va_list			args;
+
+	dprintf(STDERR_FILENO, "ft_traceroute: ");
+	va_start(args, message);
+	vdprintf(STDERR_FILENO, message, args);
+	va_end(args);
+	exit(exitcode);
 }
 
-#else
-
-void	print_help(uint8_t ext)
+void		get_msgsize(t_tracert_data *rt, char *av)
 {
-	dprintf(2, "Options: \n");
-	dprintf(2, "  -h\t\tShows this page.\n");
-	print_usage(ext);
-}
-
-#endif
-
-void	traceroute_fatal(const char *failed_here, const char *errbuff)
-{
-	dprintf(STDERR_FILENO, "Fatal error in %s: %s\n", failed_here, errbuff);
+	if (ft_strlen(av) > 5 || ft_isnumeric(av) == 0)
+		traceroute_exit(42, "invalid size -- '%s'\n", av);
+	else if (ft_atoi(av) < 0 || ft_atoi(av) > 1500)
+		traceroute_exit(42, "invalid size -- '%s'\n", av);
+	else
+	{
+		rt->totalsize = ft_atoi(av);
+		if (rt->totalsize < MINIMAL_TOTALSIZE)
+			rt->totalsize = MINIMAL_TOTALSIZE;
+	}
 }

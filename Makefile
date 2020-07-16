@@ -12,24 +12,49 @@
 
 #---------------------------------- GENERAL -----------------------------------#
 
+.SUFFIXES:
+
 NAME=ft_traceroute
-DEBUG_NAME=ft_traceroutedbg
+BONUS=ft_traceroute_bonus
 
 CC=clang
 
 PATH_LIB=libft/
 
 LIBFT= $(PATH_LIB)libft.a
-LIBFTDB= $(PATH_LIB)libftdb.a
 
 CFLAGS += -Wall
 CFLAGS += -Wextra
-#CFLAGS += -Werror
 
-DBFLAGS += $(CFLAGS)
-DBFLAGS += -fsanitize=address,undefined
-DBFLAGS += -ggdb3
+# Compiler Debug Flags
+ifeq ($(d), 0)
+	CFLAGS += -g3
+else ifeq ($(d), 1)
+	CFLAGS += -g3
+	CFLAGS += -fsanitize=address,undefined
+else ifeq ($(d), 2)
+	CFLAGS += -g3
+	CFLAGS += -fsanitize=address,undefined
+	CFLAGS += -Wpadded
+else ifeq ($(d), 3)
+	CFLAGS += -g3
+	CFLAGS += -fsanitize=address,undefined
+	CFLAGS += -Wpadded
+	CFLAGS += -pedantic
+else ifeq ($(d), 4)
+	CFLAGS += -g3
+	CFLAGS += -fsanitize=address,undefined
+	CFLAGS += -Wpadded
+	CFLAGS += -pedantic
+	CFLAGS += -Weverything
+endif
+ifneq ($(err), no)
+	CFLAGS += -Werror
+endif
 
+# Debug Dir
+DSYM += $(NAME).dSYM
+DSYM += $(DBNAME).dSYM
 #---------------------------------- INCLUDES ----------------------------------#
 
 INCLUDES_LIBFT = $(PATH_LIB)includes/
@@ -60,6 +85,7 @@ SRCS += utils.c
 SRCS += display.c
 SRCS += send.c
 SRCS += receive.c
+SRCS += option_tools.c
 
 vpath %.c $(PATH_SRCS)
 
@@ -68,8 +94,8 @@ vpath %.c $(PATH_SRCS)
 PATH_OBJS = objs/
 OBJS = $(patsubst %.c, $(PATH_OBJS)%.o, $(SRCS))
 
-DEBUG_PATH_OBJS = objs_debug/
-DEBUG_OBJS = $(patsubst %.c, $(DEBUG_PATH_OBJS)%.o, $(SRCS))
+PATH_OBJS_B = objs_b/
+OBJS_BONUS = $(patsubst %.c, $(PATH_OBJS_B)%.o, $(SRCS))
 
 
 #---------------------------------- THA RULES ---------------------------------#
@@ -86,41 +112,35 @@ $(OBJS): $(PATH_OBJS)%.o: %.c $(HEADER) Makefile
 $(PATH_OBJS):
 	mkdir $@
 
-$(LIBFT): FORCE 
-	$(MAKE) -C $(PATH_LIB)
+bonus: $(PATH_OBJS_B) $(BONUS)
 
-#---------------------------------- DEBUGGING ---------------------------------#
-
-
-debug: $(DEBUG_PATH_OBJS) $(DEBUG_NAME)
-
-$(DEBUG_NAME): $(LIBFTDB) $(DEBUG_OBJS)
-	$(CC) $(DBFLAGS) $(I_INCLUDES) $(DEBUG_OBJS) $(LIBFTDB) -o $@
+$(BONUS): $(LIBFT) $(OBJS_BONUS)
+	$(CC) $(CFLAGS) $(I_INCLUDES) $(OBJS_BONUS) $(LIBFT) -o $@
 	printf "$@ is ready.\n"
 
-$(DEBUG_OBJS): $(DEBUG_PATH_OBJS)%.o: %.c $(HEADER) Makefile
-	$(CC) $(DBFLAGS) $(I_INCLUDES) -c $< -o $@
+$(OBJS_BONUS): $(PATH_OBJS_B)%.o: %.c $(HEADER) Makefile
+	$(CC) $(CFLAGS) -DBONUS_H $(I_INCLUDES) -c $< -o $@
 
-$(DEBUG_PATH_OBJS):
+$(PATH_OBJS_B):
 	mkdir $@
 
-$(LIBFTDB): FORCE
-	$(MAKE) debug -C $(PATH_LIB)
+$(LIBFT): FORCE 
+	$(MAKE) -C $(PATH_LIB)
 
 #---------------------------------- CLEANING ----------------------------------#
 
 clean:
 	$(RM) $(OBJS)
-	$(RM) $(DEBUG_OBJS)
+	$(RM) $(OBJS_BONUS)
 	$(RM) -R $(PATH_OBJS)
-	$(RM) -R $(DEBUG_PATH_OBJS)
+	$(RM) -R $(PATH_OBJS_B)
 	$(RM) -R $(DSYM)
 	$(MAKE) -C $(PATH_LIB) clean
 	printf "Objs from $(NAME) removed\n"
 
 fclean: clean
 	$(RM) $(NAME)
-	$(RM) $(DEBUG_NAME)
+	$(RM) $(BONUS)
 	$(MAKE) -C $(PATH_LIB) fclean
 	printf "$(NAME) removed\n"
 

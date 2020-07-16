@@ -12,12 +12,44 @@
 
 #include "ft_traceroute.h"
 
-void			print_traceroute(t_tracert_data *runtime)
+void			print_traceroute(t_tracert_data *runtime, t_loopdata *ld)
 {
-	printf("ft_traceroute to %s (%s), %d hops max, %d byte packets\n",
+	dprintf(2, "ft_traceroute to %s (%s), %d hops max, %d byte packets\n",
 			runtime->target_str, runtime->target_ipv4,
 			runtime->max_ttl, runtime->totalsize);
+	ld->request_nb = 1;
+	ld->reached_target = 0;
 }
+
+#ifdef BONUS_H
+
+static void		print_reverse(t_tracert_data *runtime,
+						struct sockaddr_in *raddr)
+{
+	char	fqdn[256];
+
+	ft_bzero(fqdn, 256);
+	if (!(runtime->options & OPT_NOMAPPING))
+	{
+		reverse_target(raddr, fqdn);
+		dprintf(2, " %s (%s) ", (ft_strlen(fqdn) == 0)
+			? runtime->current_responder : fqdn,
+			runtime->current_responder);
+	}
+	else
+		dprintf(2, " %s ", runtime->current_responder);
+}
+
+#else
+
+static void		print_reverse(t_tracert_data *runtime,
+							struct sockaddr_in *raddr)
+{
+	(void)raddr;
+	dprintf(2, " %s ", runtime->current_responder);
+}
+
+#endif
 
 void			print_stats(t_tracert_data *runtime, struct sockaddr_in *raddr,
 	t_timer *tm)
@@ -28,30 +60,14 @@ void			print_stats(t_tracert_data *runtime, struct sockaddr_in *raddr,
 	if (runtime->current_responder == NULL)
 	{
 		runtime->current_responder = ft_strdup(inet_ntoa(raddr->sin_addr));
-		if (!(runtime->options & OPT_NOMAPPING))
-		{
-			reverse_target(raddr, fqdn);
-			printf(" %s (%s) ", (ft_strlen(fqdn) == 0)
-				? runtime->current_responder : fqdn,
-					runtime->current_responder);
-		}
-		else
-			printf(" %s ", runtime->current_responder);
+		print_reverse(runtime, raddr);
 	}
 	else if (ft_strequ(runtime->current_responder,
-		inet_ntoa(raddr->sin_addr)) == 0)
+					inet_ntoa(raddr->sin_addr)) == 0)
 	{
 		ft_strdel(&runtime->current_responder);
 		runtime->current_responder = ft_strdup(inet_ntoa(raddr->sin_addr));
-		if (!(runtime->options & OPT_NOMAPPING))
-		{
-			reverse_target(raddr, fqdn);
-			printf(" %s (%s) ", (ft_strlen(fqdn) == 0)
-				? runtime->current_responder : fqdn,
-				runtime->current_responder);
-		}
-		else
-			printf(" %s ", runtime->current_responder);
+		print_reverse(runtime, raddr);
 	}
-	printf(" %.3f ms ", plot_timer(tm));
+	dprintf(2, " %.3f ms ", plot_timer(tm));
 }

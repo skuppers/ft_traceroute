@@ -12,26 +12,7 @@
 
 #include "ft_traceroute.h"
 
-void		set_defaults(t_tracert_data *rt)
-{
-	rt->send_port = DEFAULT_STARTPORT;
-	rt->ttl = 1;
-	rt->nqueries = 3;
-	rt->max_ttl = 30;
-	rt->totalsize = 0;
-	rt->target_str = NULL;
-}
-
-void			traceroute_exit(int exitcode, const char *message, ...)
-{
-	va_list			args;
-
-	dprintf(STDERR_FILENO, "ft_traceroute: ");
-	va_start(args, message);
-	vdprintf(STDERR_FILENO, message, args);
-	va_end(args);
-	exit(exitcode);
-}
+#ifdef BONUS_H
 
 static uint8_t	check_valid(char *arg, size_t len, int min, int max)
 {
@@ -64,11 +45,11 @@ static int		get_one_opt(char **av, int i, t_tracert_data *runtime)
 	const char	*opt_str[] = {"-h", "-n", "-f", "-q", "-m" };
 
 	count = 0;
-	while (count < NB_OPT)
+	while (count < 5)
 	{
 		if (ft_strequ(av[i], opt_str[count]) == 1)
 		{
-			if (count < OPT_WITHOUT_ARG)
+			if (count < 2)
 			{
 				runtime->options |= (1 << count);
 				if (runtime->options & OPT_HELP)
@@ -84,25 +65,32 @@ static int		get_one_opt(char **av, int i, t_tracert_data *runtime)
 	return (0);
 }
 
-static void	get_msgsize(t_tracert_data *rt, char *av)
+#else
+
+static int		get_one_opt(char **av, int i, t_tracert_data *runtime)
 {
-	if (ft_strlen(av) > 5 || ft_isnumeric(av) == 0)
+	int			count;
+	const char	*opt_str[] = {"-h"};
+
+	count = 0;
+	while (count < 1)
 	{
-		traceroute_exit(42, "invalid size -- '%s'\n", av);
+		if (ft_strequ(av[i], opt_str[count]) == 1)
+		{
+			runtime->options |= (1 << count);
+			if (runtime->options & OPT_HELP)
+				print_help(42);
+			return (1);
+		}
+		count++;
 	}
-	else if (ft_atoi(av) < 0 || ft_atoi(av) > 1500)
-	{
-		traceroute_exit(42, "invalid size -- '%s'\n", av);
-	}
-	else
-	{
-		rt->totalsize = ft_atoi(av);
-		if (rt->totalsize < MINIMAL_TOTALSIZE)
-			rt->totalsize = MINIMAL_TOTALSIZE;
-	}
+	traceroute_exit(42, "invalid option -- '%s'\n", av[i]);
+	return (0);
 }
 
-void		parse_options(t_tracert_data *rt, char **av)
+#endif
+
+void			parse_options(t_tracert_data *rt, char **av)
 {
 	int			i;
 
@@ -112,10 +100,7 @@ void		parse_options(t_tracert_data *rt, char **av)
 	while (av[i] != NULL)
 	{
 		if (av[i][0] == '-')
-		{
 			i += get_one_opt(av, i, rt);
-			continue ;
-		}
 		else
 		{
 			if (rt->target_str == NULL)

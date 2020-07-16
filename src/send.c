@@ -16,9 +16,9 @@ uint8_t			send_udppacket(t_tracert_data *runtime, t_socketlst *socks,
 					t_timer *tm)
 {
 	int16_t		sent_bytes;
-	char		data_buffer[1468];
+	char		data_buffer[1500];
 
-	ft_memset(&data_buffer, 0x42, 1468);
+	ft_memset(&data_buffer, 0x42, 1500);
 	sent_bytes = sendto(socks->socket_send,
 					data_buffer, runtime->datasize, 0,
 					(struct sockaddr*)&runtime->target_addr,

@@ -28,7 +28,7 @@ static uint8_t		getsocketresult(t_tracert_data *runtime,
 	prepare_hints(&hints);
 	if ((getaddrinfo(runtime->target_str, NULL, &hints, results)) != 0)
 	{
-		printf("ft_traceroute: %s: Temporary failure in name resolution\n",
+		dprintf(2, "ft_traceroute: %s: Temporary failure in name resolution\n",
 				runtime->target_str);
 		ft_strdel(&runtime->target_str);
 		return (1);

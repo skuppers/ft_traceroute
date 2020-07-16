@@ -14,10 +14,16 @@
 
 int								main(int ac, char **av)
 {
-	t_tracert_data				runtime; 
+	t_tracert_data				runtime;
 
 	if (ac < 2)
 		print_usage(42);
+	if (getuid() != 0)
+	{
+		dprintf(2,
+			"This program needs root privileges to create Raw sockets.\n");
+		return (-1);
+	}
 	ft_bzero(&runtime, sizeof(t_tracert_data));
 	parse_options(&runtime, av);
 	if (runtime.target_str == NULL)

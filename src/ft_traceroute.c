@@ -12,7 +12,7 @@
 
 #include "ft_traceroute.h"
 
-uint			traceroute_condition(t_tracert_data *runtime, t_loopdata *ld)
+uint8_t			traceroute_condition(t_tracert_data *runtime, t_loopdata *ld)
 {
 	if (ld->reached_target != 0)
 		return (0);
@@ -21,12 +21,21 @@ uint			traceroute_condition(t_tracert_data *runtime, t_loopdata *ld)
 	return (1);
 }
 
-void			print_request_nb(t_tracert_data *runtime)
+void			print_request_nb(t_tracert_data *runtime, t_loopdata *ld)
 {
 	if (runtime->ttl < 10)
-		printf(" %d ", runtime->ttl);
+		dprintf(2, " %d ", runtime->ttl);
 	else
-		printf("%d ", runtime->ttl);
+		dprintf(2, "%d ", runtime->ttl);
+	++ld->request_nb;
+	ld->packetcount = 0;
+}
+
+static void		free_tracert_data(t_tracert_data *runtime)
+{
+	ft_strdel(&runtime->target_str);
+	ft_strdel(&runtime->target_ipv4);
+	freeaddrinfo(runtime->result);
 }
 
 int32_t			ft_traceroute(t_tracert_data *runtime)
@@ -37,30 +46,23 @@ int32_t			ft_traceroute(t_tracert_data *runtime)
 
 	if (create_sockets(&sockets) != 0)
 		return (-1);
-	print_traceroute(runtime);
-	ld.request_nb = 1;
-	ld.reached_target = 0;
+	print_traceroute(runtime, &ld);
 	while (traceroute_condition(runtime, &ld) == 1)
 	{
+		print_request_nb(runtime, &ld);
 		increase_ttl(runtime, &sockets);
-		print_request_nb(runtime);
-		ld.packetcount = 0;
 		runtime->current_responder = NULL;
 		while (ld.packetcount < runtime->nqueries)
 		{
 			if (send_udppacket(runtime, &sockets, &pktimer) != 0)
 				break ;
-			ld.reached_target = receive_routine(runtime, &sockets, &pktimer);
+			ld.reached_target += receive_routine(runtime, &sockets, &pktimer);
 			increase_portnb(runtime);
 			++ld.packetcount;
 		}
-		printf("\n");
+		dprintf(2, "\n");
 		ft_strdel(&runtime->current_responder);
-		++ld.request_nb;
-		++runtime->ttl;
 	}
-	ft_strdel(&runtime->target_str);
-	ft_strdel(&runtime->target_ipv4);
-	freeaddrinfo(runtime->result);
+	free_tracert_data(runtime);
 	return (0);
 }

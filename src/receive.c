@@ -56,6 +56,6 @@ uint8_t			receive_routine(t_tracert_data *runtime, t_socketlst *socks,
 	if (FD_ISSET(socks->socket_recv, &recv_set))
 		return (receive_packet(runtime, socks, tm));
 	else
-		printf(" * ");
+		dprintf(2, " * ");
 	return (0);
 }

@@ -34,8 +34,6 @@
 # include <net/if.h>
 # include "libft.h"
 
-# define NB_OPT 			5
-# define OPT_WITHOUT_ARG 	2
 # define OPT_HELP			0x1
 # define OPT_NOMAPPING		0x2
 # define IP4_HDRLEN			20
@@ -59,18 +57,20 @@ typedef struct			s_timer
 
 typedef struct			s_tracert_data
 {
-	uint8_t				options;
 	uint32_t			totalsize;
 	uint32_t			datasize;
 	uint16_t			ttl;
 	uint16_t			max_ttl;
+	uint8_t				options;
 	uint8_t				nqueries;
+	char				padding[2];
 	char				*target_str;
 	char				*target_ipv4;
 	struct addrinfo		*result;
 	struct sockaddr_in	target_addr;
 	char				*current_responder;
 	uint16_t			send_port;
+	char				more_padding[6];
 }						t_tracert_data;
 
 typedef struct			s_loopdata
@@ -103,6 +103,10 @@ uint8_t					receive_packet(t_tracert_data *runtime,
 							t_socketlst *socks, t_timer *tm);
 uint8_t					receive_routine(t_tracert_data *runtime,
 							t_socketlst *socks, t_timer *tm);
-void					print_traceroute(t_tracert_data *runtime);
-
+void					print_traceroute(t_tracert_data *runtime,
+							t_loopdata *ld);
+void					traceroute_exit(int exitcode,
+							const char *message, ...);
+void					set_defaults(t_tracert_data *rt);
+void					get_msgsize(t_tracert_data *rt, char *av);
 #endif
