@@ -16,16 +16,15 @@ uint8_t			receive_packet(t_tracert_data *runtime, t_socketlst *socks,
 					t_timer *tm)
 {
 	char				recv_buffer[1500];
-	int32_t				read_bytes;
 	socklen_t			sock_len;
 	struct sockaddr_in	recv_addr;
 
 	ft_memset(&recv_addr, 0, sizeof(struct sockaddr_in));
 	ft_bzero(&recv_buffer, 1500);
 	sock_len = sizeof(struct sockaddr);
-	if ((read_bytes = recvfrom(socks->socket_recv, recv_buffer,
+	if (recvfrom(socks->socket_recv, recv_buffer,
 						sizeof(recv_buffer), MSG_DONTWAIT,
-						(struct sockaddr*)&recv_addr, &sock_len)) <= 0)
+						(struct sockaddr*)&recv_addr, &sock_len) <= 0)
 		traceroute_fatal("recvrom()", "No  data has been read"
 						" or an error happened\n");
 	else

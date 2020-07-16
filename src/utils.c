@@ -31,8 +31,6 @@ float			plot_timer(t_timer *timer)
 	double		send;
 	double		recv;
 
-	send = 0;
-	recv = 0;
 	send = ((double)timer->send.tv_sec)
 		+ ((double)(0.000001f * (double)timer->send.tv_usec));
 	recv = ((double)timer->recv.tv_sec)
@@ -40,9 +38,13 @@ float			plot_timer(t_timer *timer)
 	return ((float)(recv - send) * 1000.0f);
 }
 
+#ifdef BONUS_H
+
 void			reverse_target(struct sockaddr_in *raddr, char *buffer)
 {
 	if (getnameinfo((struct sockaddr *)raddr, sizeof(struct sockaddr),
 			buffer, 256, NULL, 0, 0))
 		ft_bzero(buffer, 256);
 }
+
+#endif

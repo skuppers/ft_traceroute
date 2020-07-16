@@ -33,9 +33,19 @@ void			print_request_nb(t_tracert_data *runtime, t_loopdata *ld)
 
 static void		free_tracert_data(t_tracert_data *runtime)
 {
+	struct addrinfo	*tmp;
+	struct addrinfo *todel;
+
 	ft_strdel(&runtime->target_str);
 	ft_strdel(&runtime->target_ipv4);
-	freeaddrinfo(runtime->result);
+	todel = runtime->result;
+	tmp = NULL;
+	while (todel != NULL)
+	{
+		tmp = todel->ai_next;
+		free(todel);
+		todel = tmp;
+	}
 }
 
 int32_t			ft_traceroute(t_tracert_data *runtime)

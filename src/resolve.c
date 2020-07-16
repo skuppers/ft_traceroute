@@ -14,7 +14,7 @@
 
 static void			prepare_hints(struct addrinfo *hints)
 {
-	memset(hints, 0, sizeof(struct addrinfo));
+	ft_memset(hints, 0, sizeof(struct addrinfo));
 	hints->ai_family = AF_INET;
 	hints->ai_socktype = 0;
 	hints->ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
@@ -36,20 +36,12 @@ static uint8_t		getsocketresult(t_tracert_data *runtime,
 	return (0);
 }
 
-uint8_t				store_target_strings(t_tracert_data *runtime)
+void				store_target_strings(t_tracert_data *runtime)
 {
-	char			buffer[INET_ADDRSTRLEN];
+	char			*buffer;
 
-	ft_bzero(buffer, INET_ADDRSTRLEN);
-	if (inet_ntop(AF_INET, &runtime->target_addr.sin_addr, buffer,
-		INET_ADDRSTRLEN) == NULL)
-	{
-		traceroute_fatal("inet_ntop", "undefined");
-		ft_strdel(&runtime->target_str);
-		return (-1);
-	}
+	buffer = inet_ntoa(runtime->target_addr.sin_addr);
 	runtime->target_ipv4 = ft_strdup(buffer);
-	return (0);
 }
 
 int8_t				resolve_target(t_tracert_data *runtime)
@@ -63,7 +55,7 @@ int8_t				resolve_target(t_tracert_data *runtime)
 	runtime->target_addr = *((struct sockaddr_in*)result->ai_addr);
 	runtime->target_addr.sin_family = AF_INET;
 	runtime->target_addr.sin_port = htons(runtime->send_port);
-	memset(&(runtime->target_addr.sin_zero), '\0', 8);
+	ft_memset(&(runtime->target_addr.sin_zero), '\0', 8);
 	store_target_strings(runtime);
 	return (0);
 }
