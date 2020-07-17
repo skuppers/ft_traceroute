@@ -12,6 +12,14 @@
 
 #include "ft_traceroute.h"
 
+static uint8_t	is_localhost(t_tracert_data *runtime, char *recv)
+{
+	if (ft_strequ(runtime->target_ipv4, "0.0.0.0")
+		&& ft_strequ(recv, "127.0.0.1"))
+		return (42);
+	return (0);
+}
+
 uint8_t			receive_packet(t_tracert_data *runtime, t_socketlst *socks,
 					t_timer *tm)
 {
@@ -31,7 +39,8 @@ uint8_t			receive_packet(t_tracert_data *runtime, t_socketlst *socks,
 	{
 		gettimeofday(&tm->recv, NULL);
 		print_stats(runtime, &recv_addr, tm);
-		if (ft_strequ(inet_ntoa(recv_addr.sin_addr), runtime->target_ipv4))
+		if (ft_strequ(inet_ntoa(recv_addr.sin_addr), runtime->target_ipv4)
+			|| is_localhost(runtime, inet_ntoa(recv_addr.sin_addr)))
 			return (42);
 	}
 	return (0);

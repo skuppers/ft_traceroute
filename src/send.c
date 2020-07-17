@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "ft_traceroute.h"
+#include <errno.h>
 
 uint8_t			send_udppacket(t_tracert_data *runtime, t_socketlst *socks,
 					t_timer *tm)
@@ -25,8 +26,13 @@ uint8_t			send_udppacket(t_tracert_data *runtime, t_socketlst *socks,
 					sizeof(struct sockaddr));
 	if (sent_bytes < 0)
 	{
+		if (errno == EACCES)
+		{
+			dprintf(2, "ft_ping: sendto() failed: permission denied\n");
+			exit(42);
+		}
 		traceroute_fatal("send_udp_packet()",
-			"No  data has been sent or an error happened\n");
+			"No  data has been sent or an error happened");
 		return (1);
 	}
 	gettimeofday(&tm->send, NULL);
