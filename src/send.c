@@ -33,7 +33,7 @@ uint8_t			send_udppacket(t_tracert_data *runtime, t_socketlst *socks,
 		}
 		traceroute_fatal("send_udp_packet()",
 			"No  data has been sent or an error happened");
-		return (1);
+		exit(42);
 	}
 	gettimeofday(&tm->send, NULL);
 	return (0);
